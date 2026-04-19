@@ -16,7 +16,7 @@
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![LightGBM](https://img.shields.io/badge/LightGBM-GBDT-018EAD?style=for-the-badge)](https://lightgbm.readthedocs.io)
 [![OR-Tools](https://img.shields.io/badge/OR--Tools-CP--SAT-4285F4?style=for-the-badge&logo=google)](https://developers.google.com/optimization)
-[![Accuracy](https://img.shields.io/badge/Accuracy-73%25_Quick_MAPE-success?style=for-the-badge)](/)
+[![Accuracy](https://img.shields.io/badge/Accuracy-73%25_MAPE-success?style=for-the-badge)](/)
 [![vs Verteego](https://img.shields.io/badge/vs_Verteego-+3.32_pts-brightgreen?style=for-the-badge)](/)
 
 </div>
@@ -27,7 +27,7 @@
 
 **Nostra** is the only demand forecasting and procurement optimization engine purpose-built for **Quick-Service Restaurants (QSR)**. It combines a multi-model ensemble with statistically guaranteed prediction intervals and a perishable-aware inventory optimizer — all in a single, fully automated daily pipeline.
 
-> **73.01% Quick-metric accuracy** on SKU-level daily demand. **+3.32 points over the incumbent commercial solution** (Verteego) across 119 days, 51 SKUs, and 5,834 observations.
+> **73.01% MAPE accuracy** on SKU-level daily demand. **+3.32 points over the incumbent commercial solution** (Verteego) across 119 days, 51 SKUs, and 5,834 observations.
 
 ---
 
@@ -35,7 +35,7 @@
 
 | Metric | Nostra (p50) | Verteego | Delta |
 |--------|-------------|----------|-------|
-| **Quick MAPE Accuracy** | **73.01%** | 69.69% | **+3.32 pts** |
+| **MAPE Accuracy** | **73.01%** | 69.69% | **+3.32 pts** |
 | **wMAPE Accuracy** | **82.00%** | 79.22% | **+2.78 pts** |
 | Ingredient-level BOM accuracy | **77.32%** | 72.47% | **+4.85 pts** |
 | Best category margin (Burgers) | **+7.69 pts** | baseline | — |
@@ -73,9 +73,9 @@ The table below benchmarks Nostra against every major forecasting and optimizati
 |---------|:----------:|:------------:|:-------:|:-----------:|:-------:|:--------:|:----------:|
 | **Consumption-aware sauce / condiment model** (BOM attach-rate correction) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | **LTO cannibalisation matrix** (substitutability effects) | ✅ | ❌ | ❌ | 🟡 | 🟡 | 🟡 | ❌ |
-| **Ramadan + Eid cultural calendar** features | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| School holiday zones (Île-de-France zone C) | ✅ | ❌ | 🟡 | 🟡 | 🟡 | ❌ | ❌ |
-| French public holidays | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Cultural & religious event calendar** (multi-faith demand shifts) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| School holiday zones | ✅ | ❌ | 🟡 | 🟡 | 🟡 | ❌ | ❌ |
+| Public holidays | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Weather features with anti-leakage noise injection | ✅ | ❌ | ❌ | 🟡 | 🟡 | 🟡 | ❌ |
 | POS operational signals (sessions, discounts, cancels) | ✅ | ❌ | ❌ | 🟡 | ❌ | 🟡 | ✅ |
 | Intraday channel / daypart breakdown | ✅ | ❌ | ❌ | 🟡 | 🟡 | 🟡 | ✅ |
@@ -133,7 +133,7 @@ min Σ_t (1000 × shortage[t] + 100 × waste[t] + 1 × inventory[t])
 ```
 
 ### 4. 🌙 Cultural Intelligence — Demographics Is Signal
-Créteil has a significant Muslim population. Ramadan shifts dinner demand by 40%+ on certain SKUs. Eid creates a sharp demand spike. No commercial tool ships with this. Nostra does — with a signed `days_to_eid` feature (clamped to ±15) that learned the demand curve from two years of history.
+Every neighborhood has its own demand calendar. Religious observances, cultural celebrations, and community events create demand shifts of 40%+ that generic tools are completely blind to. Nostra encodes these patterns with signed temporal proximity features (e.g. days before/after a key event, clamped to ±15) and learns the full demand curve shape from historical data. No commercial tool ships with this level of local cultural awareness.
 
 ### 5. 🤝 The Override Corpus — Your Manager Is a Label Generator
 Every time a manager adjusts an order, Nostra captures: original recommendation, final decision, and reason code. This append-only corpus is the foundation of a future **decision agent** trained entirely on validated human judgment. The data moat grows every single day.
@@ -169,7 +169,7 @@ Every time a manager adjusts an order, Nostra captures: original recommendation,
 
 ## 📊 Performance Deep Dive
 
-### By Category (Quick MAPE, Nostra vs Verteego)
+### By Category (MAPE, Nostra vs Verteego)
 
 | Category | Nostra | Verteego | Delta | Volume (units) |
 |----------|--------|----------|-------|----------------|
@@ -202,18 +202,18 @@ Nostra is the **only system** that lets operators explicitly choose their servic
 ## 🚀 Quick Start
 
 ```bash
-git clone https://github.com/your-org/nostracommande
-cd nostracommande
+git clone https://github.com/lacomberobin-rgb/nostra
+cd nostra
 pip install -e ".[dev]"
 
 # Run full daily pipeline
-python -m nostra.pipeline.daily_forecast --store F168 --horizon 14
+python -m nostra.pipeline.daily_forecast --store <store_id> --horizon 14
 
 # Launch dashboard
 streamlit run src/nostra/dashboard/app.py
 
 # Run benchmark scorecard
-python -m nostra.evaluation.scorecard --store F168
+python -m nostra.evaluation.scorecard --store <store_id>
 ```
 
 ---
@@ -222,7 +222,7 @@ python -m nostra.evaluation.scorecard --store F168
 
 | Milestone | Target | Status |
 |-----------|--------|--------|
-| Production deployment (F168 pilot) | Q1 2026 | ✅ Live |
+| Production deployment (pilot store) | Q1 2026 | ✅ Live |
 | Hierarchical clustering for cold-start SKUs | Q2 2026 | 🔄 In progress |
 | Multi-site rollout | Q3 2026 | 📋 Planned |
 | Decision agent trained on override corpus | Q4 2026 | 📋 Planned |
